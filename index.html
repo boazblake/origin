@@ -21,13 +21,17 @@
 
 		<div id="dataContents">
 			<div id="hed">HEADER
-				<input type="search" placeholder="Search Here">
+				<div id="floating-panel">
+					<input id="address" type="textbox" placeholder="Search for a location">
+					<input id="submit" type="button" value="Geocode">
+				</div>
+				<div id="map"></div>
 			</div>
 			
 			<div id="buttons">
-			<button class="buttons" value="now"></button>
-			<button class="buttons" value="hour"></button>
-			<button class="buttons" value="week"></button>
+			<button class="buttons now" value="now">NOW</button>
+			<button class="buttons hour" value="hour">HOUR</button>
+			<button class="buttons week" value="week">WEEK</button>
 			</div>
 			<div id="weatherData">DYNAMIC WEATHER DATA GOES HERE</div>
 		</div>
