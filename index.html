@@ -8,27 +8,31 @@
 </head>
 
 <body>
-	<div class="alignChildren container">
+	<div id="container" class="alignChildren">
+
+
 		<div class="tempContainer">
-				<div class="tempBackDrop topOfTemp"></div>			<div class="topOfTemp fluidObject"></div>
+				<div class="tempBackDrop topOfTemp"></div>
+				<div class="topOfTemp fluidObject"></div>
 				<div class="bottomOfTemp"></div>
 		</div>
-		<div class="rightContents"><input type="search" placeholder="Search Here">
-			<div class="info">
-				<div class="current box">TODAY
-				<div class="temp"></div>
-				<div class="icon"></div>
-				<div class="text"></div>
-				<div class="date"></div>
-				<div class="rain"></div>
-				</div>
-				<div class="view box">VIEWS</div>
-				<div class="button box">BUTTONS
-					<button value="WEEK"></button>
-					<button value="HOUR"></button>
-				</div>
+
+
+
+		<div id="dataContents">
+			<div id="hed">HEADER
+				<input type="search" placeholder="Search Here">
 			</div>
+			
+			<div id="buttons">
+			<button class="buttons" value="now"></button>
+			<button class="buttons" value="hour"></button>
+			<button class="buttons" value="week"></button>
+			</div>
+			<div id="weatherData">DYNAMIC WEATHER DATA GOES HERE</div>
 		</div>
+	
+
 	</div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>

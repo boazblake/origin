@@ -1,3 +1,5 @@
+/*BASE SETTINGS*/
+
 * {
     box-sizing: border-box;
 }
@@ -14,6 +16,7 @@ input{
 .alignChildren {
     font-size: 0;
 	height:90vh;
+	width: 80%;
 }
 
 .alignChildren *{
@@ -23,31 +26,25 @@ input{
 
 }
 
-.container {
+#container {
 	height:90vh;
 	position: relative;
 }
 
 
-.container  *{
+#container  *{
 	border: 1px solid black;
 }
 
 
+
+/*Thermomeater Settings*/
 .tempContainer {
 	width: 30%;
 	height: 600px;
 	position: absolute;
 	margin: auto;
 }
-
-.rightContents {
-	width: 60%;
-	height: 80%;
-	position: absolute;
-	right: 0;
-}
-
 
 .topOfTemp{
 	bottom: 100px;
@@ -81,17 +78,25 @@ input{
 	border-radius: 75%;
 }
 
-.info {
-	position: relative;
-	width: 90%;
-	height: 60vh;
-	margin: 10px;
+/*DATA CONTENTS*/
+
+#dataContents {
+	width: 60%;
+	height: 80%;
+	position: absolute;
+	right: 0;
 }
 
-.box {
-	display: block;
-	height: 32%;
-	/*width: 80%;*/
-	margin: auto;
-	font-family: helvetica;
+#hed {
+	width: 100%;
 }
+
+#buttons {
+	width: 100%;
+}
+
+#weatherData {
+	width: 80%;
+	margin: 0 auto;
+}
+
