@@ -37,7 +37,7 @@ function controller() {
     var forcast_URL = build_Forcast_API_URL(stringLat, stringLong)
     console.log(forcast_URL)
 
-    make_And_Return_Forecast_Promise(forcast_URL).then(render_Hour_View)
+    make_And_Return_Forecast_Promise(forcast_URL).then(render_Week_View)
 }
 
 function handle_Forcast_Data(forcast_Data) {
@@ -110,6 +110,7 @@ function newSearch(keyEvent) {
     }
 }
 
+//Google Geocoder converter
 var GeocoderRequest = function(query) {
     console.log(query)
     var params = {
@@ -123,6 +124,7 @@ var GeocoderRequest = function(query) {
     promise_To_Google.then(parse_Google_Lat_Long)
 }
 
+// from Google geolocator to URL
 function parse_Google_Lat_Long(google_Data) {
     var results = google_Data.results
     var google_lat_Long = results[0].geometry.location
@@ -132,8 +134,7 @@ function parse_Google_Lat_Long(google_Data) {
     window.location.hash = '/' + lat + ',' + long
 }
 
-// Parameters
-
+// Parameters for Google Geocoder
 function _formattedURLParams(paramsObj) {
     console.log(paramsObj)
     var paramString = ''
@@ -204,7 +205,6 @@ function render_Now_View(current_Weather_Data) {
     console.log(WeatherBox.innerHTML)
 }
 
-
 // Capturing Hour Data
 function render_Hour_View(hourly_Weather_Data) {
 
@@ -216,7 +216,7 @@ function render_Hour_View(hourly_Weather_Data) {
 
     var hour_by_Hour_Array = hourly_Weather_Data.hourly.data
 
-    function HOUR_Constructor(dom_node_element, templateBuilder_fn) {
+    function View_Constructor(dom_node_element, templateBuilder_fn) {
         this._node_element = dom_node_element
         this._template = templateBuilder_fn
 
@@ -252,18 +252,81 @@ function render_Hour_View(hourly_Weather_Data) {
 
             var hour_Temp = '<h2>Hour: ' + hour + '</h5>'
                 hour_Temp += '<h5>Temp: ' + hour_Array[i].temperature + '<F /h5>'
-                hour_Temp += '<h4>' + hour_Array[i].summary + '</h4>'
-                hour_Temp += '<h3>' + hour_Array[i].precipProbability + '</h3>'
+                hour_Temp += '<h4> chance of rain: ' + hour_Array[i].precipProbability + '</h4>'
                 array_HTML_str += '<div class="hourContainer">' + hour_Temp + '</div>'
             }
         }
         return 'Todays Summary is: ' +  hour_WeatherDetails + array_HTML_str
     }
-    var contentViewInstance = new HOUR_Constructor('#weatherData', hour_by_Hour_Template)
-    contentViewInstance.renderHTML(hour_by_Hour_Array)
 
+
+    var hourViewInstance = new View_Constructor('#weatherData', hour_by_Hour_Template)
+    
+    contentViewInstance.renderHTML(hour_by_Hour_Array)
 }
 
+// Capturing week Data
+function render_Week_View(Week_Weather_Data) {
+
+    console.log(Week_Weather_Data)
+        // Summary and Icon
+    var week_WeatherDetails = Week_Weather_Data.daily.summary
+    console.log(week_WeatherDetails)
+
+    var week_Array = Week_Weather_Data.daily.data
+    console.log()
+
+    function week_Constructor(dom_node_element, templateBuilder_fn) {
+        this._node_element = dom_node_element
+        this._template = templateBuilder_fn
+
+        this.renderHTML = function(input_data) {
+
+            var targetDOM_element = document.querySelector(this._node_element)
+
+            targetDOM_element.innerHTML = this._template(input_data)
+
+            console.log(targetDOM_element)
+        }
+    }
+
+    var someHTMLTemplate = null
+
+    function week_Template(week_Array) {
+        var array_HTML_str = ''
+        console.log(week_Array)
+        var week = ''
+        var week_details = week_WeatherDetails
+                console.log(week_details)
+
+        for (var i = 0; i < week_Array.length; i++) {
+
+            // // Date object -- time_value: NOW
+            // // var nowDate = new Date()
+
+
+            for (var i = 0; i < week_Array.length; i++) {
+            var fulldate = new Date()
+                var week = week_Array[i].time
+           
+                console.log(week)
+
+
+            var week_Temp = '<h2>week: ' + week + '</h5>'
+                week_Temp += '<h5>Max_Temp: ' + week_Array[i].temperatureMax + '<F /h5>'
+                week_Temp += '<h5>Min_Temp: ' + week_Array[i].temperatureMin + '<F /h5>'
+                week_Temp += '<h4> chance of rain: ' + week_Array[i].precipProbability + '</h4>'
+                week_Temp += '<h3> chance of rain: ' + week_Array[i].summary + '</h3>'
+                array_HTML_str += '<div class="weekContainer">' + week_Temp + '</div>'
+            }
+        }
+        return 'This Weeks Summary is: ' +  week_WeatherDetails + array_HTML_str
+    }
+
+
+    var week_ViewInstance = new week_Constructor('#weatherData', week_Template)
+    week_ViewInstance.renderHTML(week_Array)
+}
 
 
 // WebApp Initialized -- check for hash change
