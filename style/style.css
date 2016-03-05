@@ -114,7 +114,7 @@ input{
 	text-decoration: none;
 }
 
-.btn:hover {
+.buttons:hover {
 	background: #3cb0fd;
 	background-image: -webkit-linear-gradient(top, #666666, #3498db);
 	background-image: -moz-linear-gradient(top, #666666, #3498db);
@@ -124,7 +124,15 @@ input{
 	text-decoration: none;
 }
 
-
+.buttons:active {
+	background: #666666;
+	background-image: -webkit-linear-gradient(top, #666666, #3498db);
+	background-image: -moz-linear-gradient(top, #666666, #3498db);
+	background-image: -ms-linear-gradient(top, #666666, #3498db);
+	background-image: -o-linear-gradient(top, #666666, #3498db);
+	background-image: linear-gradient(to bottom, #666666, #3498db);
+	text-decoration: none;
+}
 
 
 #weatherData {

@@ -1,5 +1,4 @@
 console.log($)
-    // Common Var
 
 var searchBar = document.querySelector('input')
 var nowButton = document.querySelector('.now')
@@ -9,8 +8,9 @@ var weekButton = document.querySelector('.week')
 var forcast_io_API_URL = null
 var weatherURL = 'https://api.forecast.io/forecast/d7c581e2b766cf40745ce91f6d928b84'
 
-function build_Forcast_io_API_URL(input_Lat, input_long) {
-	 return weatherURL + '/' + input_Lat + ',' + input_long
+function build_Forcast_API_URL(input_Lat, input_long) {
+
+    return weatherURL + '/' + input_Lat + ',' + input_long
 }
 
 
@@ -18,58 +18,64 @@ function build_Forcast_io_API_URL(input_Lat, input_long) {
 
 //HASH CONTROL
 function controller() {
-    var route = window.location.hash.substr(2) //hasQuery stores the "#..." the substr(1) removes the #
-    var routeParts = route.split(','),
-        stringLat = routeParts[0],
-        stringLong = routeParts[1] //'garfield'
-    console.log(route)
+
+    var route = window.location.hash.substr(2)
+    var routeParts = route.split(',')
+    var stringLat = routeParts[0]
+    var stringLong = routeParts[1]
+    var viewchanged = stringLong.split('/')
+    if (viewchanged[1]) {
+        handle_Forcast_Data()
+    }
+    // if (stringLong === undefined) stringLong = 0
+    console.log(routeParts)
     console.log(stringLat)
     console.log(stringLong)
-    // console.log(jsonWeatherData)
-
-   var forcastURL =  build_Forcast_io_API_URL(stringLat, stringLong)
-   console.log(forcastURL)
-
-   make_And_Return_Weather_Promise(forcastURL).then(show_Data_for_Lat_Long) //removed  { callBack: '?' }
+    console.log(viewchanged)
 
 
+    var forcast_URL = build_Forcast_API_URL(stringLat, stringLong)
+    console.log(forcast_URL)
 
-// // View CONTROL
-//     if (viewType === 'now') {
-//         render_Now_View(currentQuery)
-//         console.log(currentQuery)
-//     } 
-//     else if (viewType === 'hour') {
-//         render_Hour_View(currentQuery)
-//     } else if (viewType === 'week') {
-//         render_Week_View(currentQuery)
-//     }
+    make_And_Return_Forecast_Promise(forcast_URL).then(render_Hour_View)
 }
 
-
-function show_Data_for_Lat_Long(jsonWeatherData) {
-	console.log(jsonWeatherData)
-// write string to DOM here
+function handle_Forcast_Data(forcast_Data) {
+    console.log(forcast_Data)
+        // // View CONTROL
+        // if (viewType === 'now') {
+        //     render_Now_View(currentQuery)
+        //     console.log(currentQuery)
+        // } 
+        // else if (viewType === 'hour') {
+        //     render_Hour_View(currentQuery)
+        // } else if (viewType === 'week') {
+        //     render_Week_View(currentQuery)
+        // }
+        // write string to DOM here depending on view.
 }
-
-
 
 // Button gets clicked to change view
-function change_View(event) {
+function button_Press(event) {
     var buttonThatWasClicked = event.target
-    if(buttonThatWasClicked === nowButton) {
-    	view = 'now'
+    console.log(buttonThatWasClicked)
+    if (buttonThatWasClicked === nowButton) {
+        view = 'now'
     } else if (buttonThatWasClicked === hourButton) {
-    	view = 'hour'
+        view = 'hour'
     } else if (buttonThatWasClicked === weekButton) {
-    	view = 'week'
+        view = 'week'
     }
-    location.hash = '#' + buttonThatWasClicked.value + '/' + view
-    console.log(location.hash)
-    
+    // location.hash = '#' + buttonThatWasClicked.value + '/' + view
+    base_Loc_Has = location.hash
+    var appendages = '/' + view
+    window.location.hash = base_Loc_Has + appendages
+
+    console.log(base_Loc_Has)
     if (window.location.hash) {
+        // window.location.href.split('#')[0]
         controller()
-}
+    }
 }
 
 
@@ -80,19 +86,18 @@ function successCallBack(positionObject) {
     var lat = positionObject.coords.latitude
     var long = positionObject.coords.longitude
 
-    forcast_io_API_URL = build_Forcast_io_API_URL(lat, long)
+    forcast_io_API_URL = build_Forcast_API_URL(lat, long)
     console.log(forcast_io_API_URL)
     window.location.hash = '/' + lat + ',' + long
 
 }
 
-// Geolocation Function Failed
+// Geolocation Function Failed --- need to run somethign instead of this.
 function FailedCallBack(positionObject) {
     baseURL = weatherURL
     var lat = positionObject.coords.latitude
     var long = positionObject.coord.longitude
     var fullURL = baseURL + '/' + lat + ',' + long
-    make_And_Return_Weather_Promise(fullURL).then(controller) //removed  { callBack: '?' }
 }
 
 // Search Function
@@ -100,12 +105,32 @@ function newSearch(keyEvent) {
     var searchBarCapture = keyEvent.target
     if (keyEvent.keyCode === 13) {
         var userLookUpVal = searchBarCapture.value
-			GeocoderRequest(userLookUpVal)
-        	console.log(userLookUpVal)
-
+        GeocoderRequest(userLookUpVal)
+        console.log(userLookUpVal)
     }
 }
 
+var GeocoderRequest = function(query) {
+    console.log(query)
+    var params = {
+        address: query,
+    }
+
+    var baseURL = 'https://maps.googleapis.com/maps/api/geocode/json'
+    var fullURL = baseURL + _formattedURLParams(params)
+    console.log(fullURL)
+    var promise_To_Google = $.getJSON(fullURL)
+    promise_To_Google.then(parse_Google_Lat_Long)
+}
+
+function parse_Google_Lat_Long(google_Data) {
+    var results = google_Data.results
+    var google_lat_Long = results[0].geometry.location
+    console.log(google_lat_Long)
+    var lat = google_lat_Long.lat
+    var long = google_lat_Long.lng
+    window.location.hash = '/' + lat + ',' + long
+}
 
 // Parameters
 
@@ -117,99 +142,126 @@ function _formattedURLParams(paramsObj) {
         paramString = '&' + paramKey + '=' + paramsObjValue
     }
     var splitString = paramString.split(' ')
-   	var joinString = splitString.join('+')
-   	var returnString = joinString.substr(1)
+    var joinString = splitString.join('+')
+    var returnString = joinString.substr(1)
     return '?' + returnString
 }
 
-// 
-
-var GeocoderRequest = function(query) {
-	console.log(query)
-	var params = {
-		address: query,
-	}
-
-	var baseURL = 'https://maps.googleapis.com/maps/api/geocode/json'
-	var fullURL = baseURL + _formattedURLParams(params)
-	console.log(fullURL)
-	var promise_To_Google = $.getJSON(fullURL)
-	promise_To_Google.then(parse_Google_Lat_Long)
-}
-
-function parse_Google_Lat_Long(google_Data) {
-	var results = google_Data.results
-	var google_lat_Long = results[0].geometry.location
-	console.log(google_lat_Long)
- 	var lat = google_lat_Long.lat
- 	var long = google_lat_Long.lng
-	window.location.hash = '/' + lat + ',' + long
- 	}
-
-
-
 // make and return Promise Defined & parameters formatted
-function make_And_Return_Weather_Promise(inputURL, paramsObj) {
-    var formattedParams = ''
-    if (paramsObj) formattedParams = _formattedURLParams(paramsObj)
-    else {
-    	formattedParams = ''
-    }
+function make_And_Return_Forecast_Promise(inputURL, paramsObj) {
+    // console.log(paramsObj)
+    // var formattedParams = ''
+    // if (paramsObj) formattedParams = _formattedURLParams(paramsObj)
+    // else {
+    //     formattedParams = null
+    // }
 
-    return $.getJSON(inputURL + formattedParams)
+    return $.getJSON(inputURL) //+ formattedParams
 
 }
-
 
 // Capturing Current Data
 function render_Now_View(current_Weather_Data) {
     console.log(current_Weather_Data)
 
-// var current_Data_To_DOM = 
+    //current Weather//
+    var current_WeatherDetails = current_Weather_Data.currently
+    console.log(current_WeatherDetails)
+        // TEMP
+    var WeatherBox = document.querySelector('#weatherData')
+    console.log(WeatherBox)
+    var tempData = current_WeatherDetails.temperature
+    WeatherBox.innerHTML = '<h1>' + tempData + '</h1>'
+    console.log(WeatherBox.innerHTML)
+        //icon
+    var iconData = current_WeatherDetails.icon
+    console.log(iconData)
+    WeatherBox.innerHTML += '<h1>' + iconData + '</h1>'
+    console.log(WeatherBox.innerHTML)
+        //     //text
+    var textData = current_WeatherDetails.summary
+    console.log(textData)
+    WeatherBox.innerHTML += '<h1>' + textData + '</h1>'
+    console.log(WeatherBox.innerHTML)
+        //     //Date
+    var dateData = current_WeatherDetails.time
+    var date = new Date();
+    var weekday = new Array(7);
+    weekday[0] = "Sunday";
+    weekday[1] = "Monday";
+    weekday[2] = "Tuesday";
+    weekday[3] = "Wednesday";
+    weekday[4] = "Thursday";
+    weekday[5] = "Friday";
+    weekday[6] = "Saturday";
+    var day = weekday[date.getDay()];
+    console.log(day)
+    WeatherBox.innerHTML += '<h1>' + day + '</h1>'
+        //rain
+    var rainData = current_WeatherDetails.precipProbability
+    console.log(rainData)
+    WeatherBox.innerHTML += '<h1> Chance of Rain:	' + rainData + '</h1>'
+    console.log(WeatherBox.innerHTML)
+}
 
 
+// Capturing Hour Data
+function render_Hour_View(hourly_Weather_Data) {
 
-    // //current Weather//
-    // var currentWeatherDetails = current_Weather_Data.currently
-    //     //TEMP
-    // var tempBox = document.querySelector('.temp')
-    //     // console.log(temp)
-    // var tempData = currentWeatherDetails.temperature
-    // tempBox.innerHTML = '<h1>' + tempData + '</h1>'
-    // console.log(tempBox.innerHTML)
-    //     //icon
-    // var iconBox = document.querySelector('.icon')
-    // var iconData = currentWeatherDetails.icon
-    // console.log(iconData)
-    // iconBox.innerHTML = '<h1>' + iconData + '</h1>'
-    // console.log(iconBox.innerHTML)
-    //     //text
-    // var textBox = document.querySelector('.text')
-    // var textData = currentWeatherDetails.icon
-    // console.log(textData)
-    // textBox.innerHTML = '<h1>' + textData + '</h1>'
-    // console.log(textBox.innerHTML)
-    //     //Date
-    // var dateBox = document.querySelector('.date')
-    // var dateData = currentWeatherDetails.time
-    // var date = new Date();
-    // var weekday = new Array(7);
-    // weekday[0] = "Sunday";
-    // weekday[1] = "Monday";
-    // weekday[2] = "Tuesday";
-    // weekday[3] = "Wednesday";
-    // weekday[4] = "Thursday";
-    // weekday[5] = "Friday";
-    // weekday[6] = "Saturday";
-    // var day = weekday[date.getDay()];
-    // console.log(day)
-    // dateBox.innerHTML = '<h1>' + day + '</h1>'
-    //     //rain
-    // var rainBox = document.querySelector('.rain')
-    // var rainData = currentWeatherDetails.precipProbability
-    // console.log(rainData)
-    // rainBox.innerHTML = '<h1> Chance of Rain:	' + rainData + '</h1>'
-    // console.log(rainBox.innerHTML)
+    console.log(hourly_Weather_Data.hourly)
+        // Summary and Icon
+    var hour_WeatherDetails = hourly_Weather_Data.hourly.summary
+    	// hour_WeatherDetails += hourly_Weather_Data.hourly.icon
+    	console.log(hour_WeatherDetails)
+
+    var hour_by_Hour_Array = hourly_Weather_Data.hourly.data
+
+    function HOUR_Constructor(dom_node_element, templateBuilder_fn) {
+        this._node_element = dom_node_element
+        this._template = templateBuilder_fn
+
+        this.renderHTML = function(input_data) {
+
+            var targetDOM_element = document.querySelector(this._node_element)
+
+            targetDOM_element.innerHTML = this._template(input_data)
+
+            console.log(targetDOM_element)
+        }
+    }
+
+    var someHTMLTemplate = null
+
+    function hour_by_Hour_Template(hour_Array) {
+        var array_HTML_str = ''
+        console.log(hour_Array)
+        var hour = 0
+        var hour_details = hour_WeatherDetails
+        for (var i = 0; i < hour_Array.length; i++) {
+
+            // // Date object -- time_value: NOW
+            // // var nowDate = new Date()
+
+
+            for (var i = 0; i < hour_Array.length; i++) {
+            var fulldate = new Date()
+                var hour = hour_Array[i].time
+           
+                console.log(hour)
+
+
+            var hour_Temp = '<h2>Hour: ' + hour + '</h5>'
+                hour_Temp += '<h5>Temp: ' + hour_Array[i].temperature + '<F /h5>'
+                hour_Temp += '<h4>' + hour_Array[i].summary + '</h4>'
+                hour_Temp += '<h3>' + hour_Array[i].precipProbability + '</h3>'
+                array_HTML_str += '<div class="hourContainer">' + hour_Temp + '</div>'
+            }
+        }
+        return 'Todays Summary is: ' +  hour_WeatherDetails + array_HTML_str
+    }
+    var contentViewInstance = new HOUR_Constructor('#weatherData', hour_by_Hour_Template)
+    contentViewInstance.renderHTML(hour_by_Hour_Array)
+
 }
 
 
@@ -222,8 +274,7 @@ if (window.location.hash) {
     navigator.geolocation.getCurrentPosition(successCallBack, FailedCallBack)
 }
 searchBar.addEventListener('keydown', newSearch)
-nowButton.addEventListener('click', change_View)
-hourButton.addEventListener('click', change_View)
-weekButton.addEventListener('click', change_View)
+nowButton.addEventListener('click', button_Press)
+hourButton.addEventListener('click', button_Press)
+weekButton.addEventListener('click', button_Press)
 window.addEventListener('hashchange', controller)
-
