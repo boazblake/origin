@@ -47,7 +47,7 @@ function controller() {
     var forcast_URL = build_Forcast_API_URL(stringLat, stringLong)
     console.log(forcast_URL)
 
-    make_And_Return_Forecast_Promise(forcast_URL).then(render_Week_View)
+    make_And_Return_Forecast_Promise(forcast_URL).then(render_View)
 }
 
 function handle_Forcast_Data(forcast_Data) {
@@ -110,7 +110,7 @@ function successCallBack(positionObject) {
 
 }
 
-// Geolocation Function Failed --- need to run somethign instead of this.
+// Geolocation Function Failed --- need to run somethign here....
 function FailedCallBack(positionObject) {
 	console.log(positionObject)
 	// var weatherBox.innerHTML
@@ -211,23 +211,34 @@ function render_Now_View(current_Weather_Data) {
     weatherBox.innerHTML += '<h1>' + day + '</h1></div>'
 }
 
-// Capturing Hour Data
-function render_Hour_View(hourly_Weather_Data) {
+	 // When button is pressed -- how to diffrentiate?
+// Capturing Hour and Week Data 
+function render_View(Weather_Data) {
 
-    console.log(hourly_Weather_Data.hourly)
+
+    console.log(Weather_Data.hourly)
+    console.log(Weather_Data.daily)
+
         // Summary and Icon
-    var hour_WeatherDetails = hourly_Weather_Data.hourly.summary
-    	// hour_WeatherDetails += hourly_Weather_Data.hourly.icon
-    	console.log(hour_WeatherDetails)
+    var hour_WeatherDetails = Weather_Data.hourly.summary
+    var week_WeatherDetails = Weather_Data.daily.summary
+    	// hour_WeatherDetails += Weather_Data.hourly.icon
+        console.log(hour_WeatherDetails)
+    	console.log(week_WeatherDetails)
 
-    var hour_by_Hour_Array = hourly_Weather_Data.hourly.data
+    var hour_By_Hour_Array = Weather_Data.hourly.data
+        console.log(hour_By_Hour_Array)
 
+    var day_By_Day_Array = Weather_Data.daily.data
+
+    // THE CONSTRUCTOR - takes in dom node location and template
     function View_Constructor(dom_node_element, templateBuilder_fn) {
         this._node_element = dom_node_element
         this._template = templateBuilder_fn
-
+        // putting the template with data  on the HTML
         this.renderHTML = function(input_data) {
 
+            // definin the Node elememnt for the template
             var targetDOM_element = document.querySelector(this._node_element)
 
             targetDOM_element.innerHTML = this._template(input_data)
@@ -236,87 +247,54 @@ function render_Hour_View(hourly_Weather_Data) {
         }
     }
 
-    // var someHTMLTemplate = null
-
-    function hour_by_Hour_Template(hour_Array) {
+    // The template to write to DOM
+    // HOUR
+    function hour_by_Hour_Template(hour_By_Hour_Array) {
         var array_HTML_str = ''
-        console.log(hour_Array)
+        console.log(hour_By_Hour_Array)
         var hour = 0
         var hour_details = hour_WeatherDetails
-        for (var i = 0; i < hour_Array.length; i++) {
+        for (var i = 0; i < hour_By_Hour_Array.length; i++) {
 
             // // Date object -- time_value: NOW
             // // var nowDate = new Date()
 
-
-            for (var i = 0; i < hour_Array.length; i++) {
+            for (var i = 0; i < hour_By_Hour_Array.length; i++) {
             var fulldate = new Date()
-                var hour = hour_Array[i].time
+                var hour = hour_By_Hour_Array[i].time
            
                 console.log(hour)
 
 
             var hour_Temp = '<h2>Hour'+[i]+': ' + hour + '</h5>'
-                hour_Temp += '<h5>Temp: ' + hour_Array[i].temperature + 'F</h5>'
-                hour_Temp += '<h4> chance of rain: ' + hour_Array[i].precipProbability + '</h4>'
+                hour_Temp += '<h5>Temp: ' + hour_By_Hour_Array[i].temperature + 'F</h5>'
+                hour_Temp += '<h4> chance of rain: ' + hour_By_Hour_Array[i].precipProbability + '</h4>'
                 array_HTML_str += '<div class="hourContainer">' + hour_Temp + '</div>'
             }
         }
         return 'Today will be: ' +  hour_WeatherDetails + array_HTML_str
     }
 
-
-    var hourViewInstance = new View_Constructor('#weatherData', hour_by_Hour_Template)
-    
-    hourViewInstance.renderHTML(hour_by_Hour_Array)
-}
-
-// Capturing week Data
-function render_Week_View(Week_Weather_Data) {
-
-    console.log(Week_Weather_Data)
-        // Summary and Icon
-    var week_WeatherDetails = Week_Weather_Data.daily.summary
-    console.log(week_WeatherDetails)
-
-    var week_Array = Week_Weather_Data.daily.data
-    console.log()
-
-    function week_Constructor(dom_node_element, templateBuilder_fn) {
-        this._node_element = dom_node_element
-        this._template = templateBuilder_fn
-
-        this.renderHTML = function(input_data) {
-
-            var targetDOM_element = document.querySelector(this._node_element)
-
-            targetDOM_element.innerHTML = this._template(input_data)
-
-            console.log(targetDOM_element)
-        }
-    }
-
-    // var someHTMLTemplate = null
-
-    function week_Template(week_Array) {
+    // The template to write to DOM
+    // WEEK
+        function week_Template(day_By_Day_Array) {
         var array_HTML_str = ''
-        console.log(week_Array)
+        console.log(day_By_Day_Array)
         // var week = ''
         // var week_details = week_WeatherDetails
                 // console.log(week_details)
 
-        for (var i = 0; i < week_Array.length; i++) {
-        	var day = week_Array[i]
-        	var time = day.time
-        	time = time * 1000
-        	console.log(time)
+        for (var i = 0; i < day_By_Day_Array.length; i++) {
+            var day = day_By_Day_Array[i]
+            var time = day.time
+            time = time * 1000
+            console.log(time)
             // // Date object -- time_value: NOW
             // // var nowDate = new Date()
 
-
-            for (var i = 0; i < week_Array.length; i++) {
+            for (var i = 0; i < day_By_Day_Array.length; i++) {
             var fulldate = new Date()
-                var weekData = week_Array[i].time
+                var weekData = day_By_Day_Array[i].time
                 var date = new Date();
                 var weekday = new Array(7);
                 weekday[0] = "Sunday";
@@ -326,24 +304,26 @@ function render_Week_View(Week_Weather_Data) {
                 weekday[4] = "Thursday";
                 weekday[5] = "Friday";
                 weekday[6] = "Saturday";
-                var week = weekday[date.getDay()];
+
+            var week = weekday[date.getDay()];
+            
             var week_Temp = '<h2>Day: ' + week + '</h5>'
-                week_Temp += '<h5>Max_Temp: ' + week_Array[i].temperatureMax + 'F<br>'
-                week_Temp += 'Min_Temp: ' + week_Array[i].temperatureMin + 'F </h5>'
-                week_Temp += '<h4> chance of rain: ' + week_Array[i].precipProbability + '</h4>'
-                week_Temp += '<p> chance of rain: ' + week_Array[i].icon + '</p>'
+                week_Temp += '<h5>Max_Temp: ' + day_By_Day_Array[i].temperatureMax + 'F<br>'
+                week_Temp += 'Min_Temp: ' + day_By_Day_Array[i].temperatureMin + 'F </h5>'
+                week_Temp += '<h4> chance of rain: ' + day_By_Day_Array[i].precipProbability + '</h4>'
+                week_Temp += '<p> chance of rain: ' + day_By_Day_Array[i].icon + '</p>'
                 array_HTML_str += '<div class="weekContainer">' + week_Temp + '</div>'
             }
         }
-        return '<p class="summery">This Weeks Summary is: ' +  week_WeatherDetails + '</p>'+ array_HTML_str 
 
+        return '<p class="summery">This Weeks Summary is: ' +  week_WeatherDetails + '</p>'+ array_HTML_str
     }
 
-
-    var week_ViewInstance = new week_Constructor('#weatherData', week_Template)
-    week_ViewInstance.renderHTML(week_Array)
+	var hourViewInstance = new View_Constructor('#weatherData', hour_by_Hour_Template)
+	hourViewInstance.renderHTML(hour_By_Hour_Array)
+	var week_ViewInstance = new View_Constructor('#weatherData', week_Template)
+	week_ViewInstance.renderHTML(day_By_Day_Array)
 }
-
 
 // WebApp Initialized -- check for hash change
 window.location.hash = ''
