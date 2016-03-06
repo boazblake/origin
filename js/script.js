@@ -7,7 +7,17 @@ var weekButton = document.querySelector('.week')
 
 var forcast_io_API_URL = null
 var weatherURL = 'https://api.forecast.io/forecast/d7c581e2b766cf40745ce91f6d928b84'
-
+function convertMS(ms) {
+var d, h, m, s;
+  s = Math.floor(ms / 1000);
+  m = Math.floor(s / 60);
+  s = s % 60;
+  h = Math.floor(m / 60);
+  m = m % 60;
+  d = Math.floor(h / 24);
+  h = h % 24;
+return { d: d, h: h, m: m, s: s };
+};
 function build_Forcast_API_URL(input_Lat, input_long) {
 
     return weatherURL + '/' + input_Lat + ',' + input_long
@@ -66,16 +76,24 @@ function button_Press(event) {
     } else if (buttonThatWasClicked === weekButton) {
         view = 'week'
     }
-    // location.hash = '#' + buttonThatWasClicked.value + '/' + view
-    base_Loc_Has = location.hash
-    var appendages = '/' + view
-    window.location.hash = base_Loc_Has + appendages
+    // // location.hash = '#' + buttonThatWasClicked.value + '/' + view
+    // base_Loc_Has = location.hash
+    // var appendages = '/' + view
+    // window.location.hash = base_Loc_Has + appendages
 
-    console.log(base_Loc_Has)
-    if (window.location.hash) {
-        // window.location.href.split('#')[0]
-        controller()
-    }
+    // console.log(base_Loc_Has)
+    // if (window.location.hash) {
+    //     // window.location.href.split('#')[0]
+        
+        if (view === 'now'){
+    make_And_Return_Forecast_Promise(forcast_URL).then(render_Week_View)
+		}
+		else if (view === 'hour') {
+    make_And_Return_Forecast_Promise(forcast_URL).then(render_Hour_View)
+		} 
+		else{
+    make_And_Return_Forecast_Promise(forcast_URL).then(render_Week_View)
+		}
 }
 
 
@@ -94,10 +112,8 @@ function successCallBack(positionObject) {
 
 // Geolocation Function Failed --- need to run somethign instead of this.
 function FailedCallBack(positionObject) {
-    baseURL = weatherURL
-    var lat = positionObject.coords.latitude
-    var long = positionObject.coord.longitude
-    var fullURL = baseURL + '/' + lat + ',' + long
+	console.log(positionObject)
+	// var weatherBox.innerHTML
 }
 
 // Search Function
@@ -158,34 +174,19 @@ function make_And_Return_Forecast_Promise(inputURL, paramsObj) {
     // }
 
     return $.getJSON(inputURL) //+ formattedParams
-
 }
 
-// Capturing Current Data
+// Capturing Now Data
 function render_Now_View(current_Weather_Data) {
-    console.log(current_Weather_Data)
-
     //current Weather//
+
     var current_WeatherDetails = current_Weather_Data.currently
-    console.log(current_WeatherDetails)
-        // TEMP
-    var WeatherBox = document.querySelector('#weatherData')
-    console.log(WeatherBox)
+    var weatherBox = document.querySelector('#weatherData')
     var tempData = current_WeatherDetails.temperature
-    WeatherBox.innerHTML = '<h1>' + tempData + '</h1>'
-    console.log(WeatherBox.innerHTML)
-        //icon
     var iconData = current_WeatherDetails.icon
-    console.log(iconData)
-    WeatherBox.innerHTML += '<h1>' + iconData + '</h1>'
-    console.log(WeatherBox.innerHTML)
-        //     //text
     var textData = current_WeatherDetails.summary
-    console.log(textData)
-    WeatherBox.innerHTML += '<h1>' + textData + '</h1>'
-    console.log(WeatherBox.innerHTML)
-        //     //Date
     var dateData = current_WeatherDetails.time
+    console.log(convertMS(dateData))
     var date = new Date();
     var weekday = new Array(7);
     weekday[0] = "Sunday";
@@ -196,13 +197,18 @@ function render_Now_View(current_Weather_Data) {
     weekday[5] = "Friday";
     weekday[6] = "Saturday";
     var day = weekday[date.getDay()];
-    console.log(day)
-    WeatherBox.innerHTML += '<h1>' + day + '</h1>'
-        //rain
+    var month = date
+    console.log(month)
     var rainData = current_WeatherDetails.precipProbability
-    console.log(rainData)
-    WeatherBox.innerHTML += '<h1> Chance of Rain:	' + rainData + '</h1>'
-    console.log(WeatherBox.innerHTML)
+    // weatherBox.innerHTML += '<div class="nowContainer">'
+    weatherBox.innerHTML += '<div class = "nowContainer"<h1> Todays Temp:	' + tempData + '</h1>'
+    weatherBox.innerHTML += '<h6>' + day + month + date.getFullYear() +'</h6>'
+    weatherBox.innerHTML += '<h1> Chance of Rain:	' + rainData + '</h1>'
+    weatherBox.innerHTML += '<h1> Chance of Rain:	' + rainData + '</h1>'
+    weatherBox.innerHTML += '<h1> Chance of Rain:	' + rainData + '</h1>'
+    weatherBox.innerHTML += '<h1>' + iconData + '</h1>'
+    weatherBox.innerHTML += '<h1>' + textData + '</h1>'
+    weatherBox.innerHTML += '<h1>' + day + '</h1></div>'
 }
 
 // Capturing Hour Data
@@ -230,7 +236,7 @@ function render_Hour_View(hourly_Weather_Data) {
         }
     }
 
-    var someHTMLTemplate = null
+    // var someHTMLTemplate = null
 
     function hour_by_Hour_Template(hour_Array) {
         var array_HTML_str = ''
@@ -250,19 +256,19 @@ function render_Hour_View(hourly_Weather_Data) {
                 console.log(hour)
 
 
-            var hour_Temp = '<h2>Hour: ' + hour + '</h5>'
-                hour_Temp += '<h5>Temp: ' + hour_Array[i].temperature + '<F /h5>'
+            var hour_Temp = '<h2>Hour'+[i]+': ' + hour + '</h5>'
+                hour_Temp += '<h5>Temp: ' + hour_Array[i].temperature + 'F</h5>'
                 hour_Temp += '<h4> chance of rain: ' + hour_Array[i].precipProbability + '</h4>'
                 array_HTML_str += '<div class="hourContainer">' + hour_Temp + '</div>'
             }
         }
-        return 'Todays Summary is: ' +  hour_WeatherDetails + array_HTML_str
+        return 'Today will be: ' +  hour_WeatherDetails + array_HTML_str
     }
 
 
     var hourViewInstance = new View_Constructor('#weatherData', hour_by_Hour_Template)
     
-    contentViewInstance.renderHTML(hour_by_Hour_Array)
+    hourViewInstance.renderHTML(hour_by_Hour_Array)
 }
 
 // Capturing week Data
@@ -290,37 +296,47 @@ function render_Week_View(Week_Weather_Data) {
         }
     }
 
-    var someHTMLTemplate = null
+    // var someHTMLTemplate = null
 
     function week_Template(week_Array) {
         var array_HTML_str = ''
         console.log(week_Array)
-        var week = ''
-        var week_details = week_WeatherDetails
-                console.log(week_details)
+        // var week = ''
+        // var week_details = week_WeatherDetails
+                // console.log(week_details)
 
         for (var i = 0; i < week_Array.length; i++) {
-
+        	var day = week_Array[i]
+        	var time = day.time
+        	time = time * 1000
+        	console.log(time)
             // // Date object -- time_value: NOW
             // // var nowDate = new Date()
 
 
             for (var i = 0; i < week_Array.length; i++) {
             var fulldate = new Date()
-                var week = week_Array[i].time
-           
-                console.log(week)
-
-
-            var week_Temp = '<h2>week: ' + week + '</h5>'
-                week_Temp += '<h5>Max_Temp: ' + week_Array[i].temperatureMax + '<F /h5>'
-                week_Temp += '<h5>Min_Temp: ' + week_Array[i].temperatureMin + '<F /h5>'
+                var weekData = week_Array[i].time
+                var date = new Date();
+                var weekday = new Array(7);
+                weekday[0] = "Sunday";
+                weekday[1] = "Monday";
+                weekday[2] = "Tuesday";
+                weekday[3] = "Wednesday";
+                weekday[4] = "Thursday";
+                weekday[5] = "Friday";
+                weekday[6] = "Saturday";
+                var week = weekday[date.getDay()];
+            var week_Temp = '<h2>Day: ' + week + '</h5>'
+                week_Temp += '<h5>Max_Temp: ' + week_Array[i].temperatureMax + 'F<br>'
+                week_Temp += 'Min_Temp: ' + week_Array[i].temperatureMin + 'F </h5>'
                 week_Temp += '<h4> chance of rain: ' + week_Array[i].precipProbability + '</h4>'
-                week_Temp += '<h3> chance of rain: ' + week_Array[i].summary + '</h3>'
+                week_Temp += '<p> chance of rain: ' + week_Array[i].icon + '</p>'
                 array_HTML_str += '<div class="weekContainer">' + week_Temp + '</div>'
             }
         }
-        return 'This Weeks Summary is: ' +  week_WeatherDetails + array_HTML_str
+        return '<p class="summery">This Weeks Summary is: ' +  week_WeatherDetails + '</p>'+ array_HTML_str 
+
     }
 
 

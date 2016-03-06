@@ -136,11 +136,32 @@ input{
 
 
 #weatherData {
-	width: 80%;
+	/*width: 80%;*/
 	margin: 0 auto;
+	/*height: 90vh;*/
+	display: flex;
+	flex-flow: row wrap;
+    justify-content: space-around;
+}
+
+.weekContainer{
+	display: inline-block;
 }
 
 
+.weekContainer * {
+	display: block;
+	margin: auto;
+}
 
+.hourContainer * {
+	display: block;
+	margin: auto;
+}
+
+.nowContainer {
+	display: block;
+	margin: 0 auto;	
+}
 
 
