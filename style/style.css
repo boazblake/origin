@@ -8,11 +8,21 @@ html {
     font-family: sans-serif;
 }
 
-input {
-    margin: 1% 50%;
-    transform: translateX(-50%);
-    -webkit-appearance: caret;
 
+input[type=search] {
+    margin: 1% 50%;
+	border-radius: 10%;
+	color: red;  
+	text-align: right;
+	cursor: pointer;
+	display: block; 
+	width: 100%; 
+	letter-spacing: 4px;        
+	text-shadow: 0 0 2px black;       
+	word-spacing: 20px;
+	transform: translateX(-50%);
+    -webkit-appearance: none;
+    -webkit-box-shadow: 0px 1px 3px #666666;              
 }
 
 .alignChildren {
@@ -28,10 +38,8 @@ input {
 
 #container {
     position: relative;
-}
-
-#container * {
-    /* border: 1px solid black; */
+    background-image: rgba(242,246,248,1) 0%, rgba(181,198,208,1) 54%, rgba(224,239,249,1) 100%);
+	padding: 10%;
 }
 
 
@@ -54,7 +62,7 @@ input {
 .tempBackDrop {
     margin: 0, auto;
     bottom: 100px;
-    height: 200px;
+    height: 100px;
     background-color: grey;
 }
 
@@ -121,17 +129,18 @@ input {
 }
 
 #weatherData {
-	height: 50vh;
+	height: 60vh;
     width: 100%;
     margin: auto;
     overflow: hidden;
+	text-align:justify;    
 }
 
 .weekContainer {
-    display: inline-block;
+	display: inline-block;
+	/* overflow:auto; */
     margin: 1%;
     box-shadow: -1px -10px 24px -1px rgba(0,0,0,0.75);
-    overflow:auto;
 }
 
 .weekContainer * {
@@ -142,7 +151,8 @@ input {
 .hourContainer {
 	margin: 1%;
     box-shadow: -1px -10px 24px -1px rgba(0,0,0,0.75);
-    overflow:auto;
+    /* overflow:auto; */
+    display: inline-block;
 }
 
 .hourContainer * {
@@ -158,7 +168,6 @@ input {
 
 }
 
-
 .nowContainer * {
     display: block;
     margin: 1%;
@@ -170,7 +179,7 @@ input {
 
 #temp {
 	font-size: 2em;
-}
+}/* 
 
 canvas {
   display: block;
@@ -183,3 +192,4 @@ canvas {
 	width: 100px;
 	height: 100px;
 }
+ */

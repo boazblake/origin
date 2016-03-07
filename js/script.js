@@ -1,9 +1,11 @@
 console.log($)
+console.log(Backbone)
 
-var searchBar = document.querySelector('input')
+var searchBar = document.querySelector('input[type=search]')
 var nowButton = document.querySelector('.now')
 var hourButton = document.querySelector('.hour')
 var weekButton = document.querySelector('.week')
+// var searchButton = document.querySelector('#submit')
 
 var forcast_io_API_URL = null
 var weatherURL = 'https://api.forecast.io/forecast/d7c581e2b766cf40745ce91f6d928b84'
@@ -18,9 +20,10 @@ var d, h, m, s;
   h = h % 24;
 return { d: d, h: h, m: m, s: s };
 };
+
 function build_Forcast_API_URL(input_Lat, input_long) {
 
-    return weatherURL + '/' + input_Lat + ',' + input_long
+    return weatherURL + '/' + input_Lat + ',' + input_long + '?callback=?'
 }
 
 /////////// MAIN CONTROLLER
@@ -29,72 +32,88 @@ function build_Forcast_API_URL(input_Lat, input_long) {
 function controller() {
 
     var route = window.location.hash.substr(2)
-    var routeParts = route.split(',')
+    var routeParts = route.split('/')//.pop()
     var stringLat = routeParts[0]
     var stringLong = routeParts[1]
-    var viewchanged = stringLong.split('/')
-    if (viewchanged[1]) {
-        handle_Forcast_Data()
-    }
-    // if (stringLong === undefined) stringLong = 0
+    var viewType = routeParts[2]
+
+    
+    console.log(window.location.hash)
+    
+    console.log(route)
     console.log(routeParts)
     console.log(stringLat)
     console.log(stringLong)
-    console.log(viewchanged)
-
+    console.log(viewType)
 
     var forcast_URL = build_Forcast_API_URL(stringLat, stringLong)
     console.log(forcast_URL)
 
-    make_And_Return_Forecast_Promise(forcast_URL).then(render_Week_View)
-}
+
+    if (viewType === 'week')
+    	{make_And_Return_Forecast_Promise(forcast_URL).then(render_Week_View)}
+
+    else if (viewType === 'hour')
+    	{make_And_Return_Forecast_Promise(forcast_URL).then(render_Hour_View)}
+
+    else {
+    	make_And_Return_Forecast_Promise(forcast_URL).then(render_Now_View)
+     }
+    
+    }
 
 function handle_Forcast_Data(forcast_Data) {
     console.log(forcast_Data)
-        // // View CONTROL
-        // if (viewType === 'now') {
-        //     render_Now_View(currentQuery)
-        //     console.log(currentQuery)
-        // } 
-        // else if (viewType === 'hour') {
-        //     render_Hour_View(currentQuery)
-        // } else if (viewType === 'week') {
-        //     render_Week_View(currentQuery)
-        // }
+        // View CONTROL
+
+        if (viewType === 'hour') {
+            render_Hour_View(currentQuery)
+        } else if (viewType === 'week') {
+            render_Week_View(currentQuery)
+        } else if (viewType === false) {
+            render_Now_View(currentQuery)
+            console.log(currentQuery)
+        } 
         // write string to DOM here depending on view.
 }
 
 // Button gets clicked to change view
 function button_Press(event) {
     var buttonThatWasClicked = event.target
-    console.log(buttonThatWasClicked)
-    if (buttonThatWasClicked === nowButton) {
+    console.log(buttonThatWasClicked.value)
+    console.log(nowButton.value)
+    var view
+    if (buttonThatWasClicked.value === nowButton.value) {
         view = 'now'
-    } else if (buttonThatWasClicked === hourButton) {
+    } else if (buttonThatWasClicked.value === hourButton.value) {
         view = 'hour'
-    } else if (buttonThatWasClicked === weekButton) {
+    } else if (buttonThatWasClicked.value === weekButton.value) {
         view = 'week'
     }
-    // // location.hash = '#' + buttonThatWasClicked.value + '/' + view
-    // base_Loc_Has = location.hash
-    // var appendages = '/' + view
-    // window.location.hash = base_Loc_Has + appendages
 
-    // console.log(base_Loc_Has)
+    console.log(window.location.hash)
+    var routeParts = window.location.hash.substr(2).split('/')
+    routeParts[2] = view
+
+    var newRoute = routeParts.join('/')
+
+    window.location.hash = '/'+ newRoute //base_Loc_Has + appendages
+
+    console.log(window.location.hash)
     // if (window.location.hash) {
-    //     // window.location.href.split('#')[0]
+        // window.location.href.split('#')[0]
         
-        if (view === 'now'){
-    make_And_Return_Forecast_Promise(forcast_URL).then(render_Week_View)
-		}
-		else if (view === 'hour') {
-    make_And_Return_Forecast_Promise(forcast_URL).then(render_Hour_View)
-		} 
-		else{
-    make_And_Return_Forecast_Promise(forcast_URL).then(render_Week_View)
-		}
+  //       if (view === 'now'){
+  //   make_And_Return_Forecast_Promise(forcast_URL).then(render_Week_View)
+		// }
+		// else if (view === 'hour') {
+  //   make_And_Return_Forecast_Promise(forcast_URL).then(render_Hour_View)
+		// } 
+		// else{
+  //   make_And_Return_Forecast_Promise(forcast_URL).then(render_Week_View)
+		// }
+	// }
 }
-
 
 // Geolocation Function Success
 function successCallBack(positionObject) {
@@ -105,7 +124,7 @@ function successCallBack(positionObject) {
 
     forcast_io_API_URL = build_Forcast_API_URL(lat, long)
     console.log(forcast_io_API_URL)
-    window.location.hash = '/' + lat + ',' + long
+    window.location.hash = '/' + lat + '/' + long + '/' + 'now'
 
 }
 
@@ -146,7 +165,7 @@ function parse_Google_Lat_Long(google_Data) {
     console.log(google_lat_Long)
     var lat = google_lat_Long.lat
     var long = google_lat_Long.lng
-    window.location.hash = '/' + lat + ',' + long
+    window.location.hash = '/' + lat + '/' + long
 }
 
 // Parameters for Google Geocoder
@@ -165,19 +184,11 @@ function _formattedURLParams(paramsObj) {
 
 // make and return Promise Defined & parameters formatted
 function make_And_Return_Forecast_Promise(inputURL, paramsObj) {
-    // console.log(paramsObj)
-    // var formattedParams = ''
-    // if (paramsObj) formattedParams = _formattedURLParams(paramsObj)
-    // else {
-    //     formattedParams = null
-    // }
-
-    return $.getJSON(inputURL) //+ formattedParams
+    return $.getJSON(inputURL)
 }
 
 // Capturing Now Data
 function render_Now_View(current_Weather_Data) {
-    //current Weather//
 
     var current_WeatherDetails = current_Weather_Data.currently
     var weatherBox = document.querySelector('#weatherData')
@@ -217,25 +228,22 @@ function render_Now_View(current_Weather_Data) {
     console.log(month)
     var HTML_Str_To_DOM = ''
     var rainData = current_WeatherDetails.precipProbability
-    // weatherBox.innerHTML += '<div class="nowContainer">'
     weatherBoxUL = '<Div class="nowContainer">'
     weatherBoxTemp ='<h6 clas="nowDeets" id="temp"> Todays Temp:	' + tempData + '  &deg </h6>'
     weatherBoxFullDate = '<h6 clas="nowDeets" id="fullDate">' + day +' '+dateofMonth+' '+ month + '' +date.getFullYear() +'</h6>'
     weatherBoxRain = '<h6 clas="nowDeets" id="rain"> Chance of Rain:	' + rainData + '</h6>'
     weatherBoxIcon = '<canvas class="nowDeets" id="icon">' + iconData + '</canvas>'
     weatherBoxText = '<h6 clas="nowDeets" id="text">' + textData + '</h6>'
-    // weatherBoxDay= '<h6 clas="nowDeets" id="day">' + day + '</h6></div>'
 
-    HTML_Str_To_DOM = weatherBoxUL + weatherBoxTemp + weatherBoxFullDate + weatherBoxRain + weatherBoxIcon + weatherBoxText //+ weatherBoxDay
-
+    HTML_Str_To_DOM = weatherBoxUL + weatherBoxTemp + weatherBoxFullDate + weatherBoxRain + weatherBoxIcon + weatherBoxText
 
     // ////////// Setting the temp bar height
     var background = document.querySelector('.tempBackDrop').style.height = "400px";
     var thermom = document.querySelector('.fluidObject').style.	height =   parseInt(tempData) / 100 *  parseInt(background)  + 'px';
 
 
-
     return weatherBox.innerHTML = HTML_Str_To_DOM
+
 }
 
 // Capturing Hour Data
@@ -281,9 +289,9 @@ function render_Hour_View(hourly_Weather_Data) {
                 console.log(fullDate)
 
 
-            var hour_Temp = '<h2>Hour'+[i]+': ' + hour + '</h5>'
-                hour_Temp += '<h5>Temp: ' + hour_Array[i].temperature + 'F</h5>'
-                hour_Temp += '<h4> chance of rain: ' + hour_Array[i].precipProbability + '</h4>'
+            var hour_Temp = '<p>Hour'+[i]+': ' + hour + '</p>'
+                hour_Temp += '<p>Temp: ' + hour_Array[i].temperature + 'F</p>'
+                hour_Temp += '<p> chance of rain: ' + hour_Array[i].precipProbability + '</p>'
                 array_HTML_str += '<div class="hourContainer">' + hour_Temp + '</div>'
             
                 // ////////// Setting the temp bar height
@@ -327,64 +335,52 @@ function render_Week_View(Week_Weather_Data) {
         }
     }
 
-    // var someHTMLTemplate = null
-
     function week_Template(week_Array) {
         var array_HTML_str = ''
         console.log(week_Array)
-        // var week = ''
-        // var week_details = week_WeatherDetails
-                // console.log(week_details)
 
         for (var i = 0; i < week_Array.length; i++) {
         	var day = week_Array[i]
         	var time = day.time
         	time = time * 1000
         	console.log(time)
-            // // Date object -- time_value: NOW
-            // // var nowDate = new Date()
-
 
             for (var i = 0; i < week_Array.length; i++) {
-            var fulldate = new Date()
+	            var fulldate = new Date()
                 var weekData = week_Array[i].time
                 var date = new Date();
                 var weekday = new Array(7);
-                weekday[0] = "Sunday";
-                weekday[1] = "Monday";
-                weekday[2] = "Tuesday";
-                weekday[3] = "Wednesday";
-                weekday[4] = "Thursday";
-                weekday[5] = "Friday";
-                weekday[6] = "Saturday";
-                var week = weekday[date.getDay()];
-            var week_Temp = '<h2>Day: ' + week + '</h5>'
-                week_Temp += '<h5>Max_Temp: ' + week_Array[i].temperatureMax + 'F<br>'
-                week_Temp += 'Min_Temp: ' + week_Array[i].temperatureMin + 'F </h5>'
-                week_Temp += '<h4> chance of rain: ' + week_Array[i].precipProbability + '</h4>'
-                week_Temp += '<p> chance of rain: ' + week_Array[i].icon + '</p>'
-                array_HTML_str += '<div class="weekContainer">' + week_Temp + '</div>'
-                
-    // ////////// Setting the temp bar height
-    var background = document.querySelector('.tempBackDrop').style.height = "400px";
-    var thermom = document.querySelector('.fluidObject').style.	height =   parseInt(week_Array[i].temperature) / 100 *  parseInt(background)  + 'px';
+	                weekday[0] = "Sunday";
+	                weekday[1] = "Monday";
+	                weekday[2] = "Tuesday";
+	                weekday[3] = "Wednesday";
+	                weekday[4] = "Thursday";
+	                weekday[5] = "Friday";
+	                weekday[6] = "Saturday";
+            	var day = weekday[date.getDay() ]
+	            var week_Temp = '<p>Day: ' + day + '</p>'
+	                week_Temp += '<p>Max_Temp: ' + week_Array[i].temperatureMax + 'F<br>'
+	                week_Temp += 'Min_Temp: ' + week_Array[i].temperatureMin + 'F </p>'
+	                week_Temp += '<p> chance of rain: ' + week_Array[i].precipProbability + '</p>'
+	                array_HTML_str += '<div class="weekContainer">' + week_Temp + '</div>'
+	           
 
+			    // ////////// Setting the temp bar height
+			    var background = document.querySelector('.tempBackDrop').style.height = "400px";
+			    var thermom = document.querySelector('.fluidObject').style.	height =   parseInt(week_Array[i].temperatureMax) / 100 *  parseInt(background)  + 'px';
             }
         }
 
-
-
         return '<p class="summery">This Weeks Summary is: ' +  week_WeatherDetails + '</p>'+ array_HTML_str 
-
     }
-
 
     var week_ViewInstance = new week_Constructor('#weatherData', week_Template)
     week_ViewInstance.renderHTML(week_Array)
 }
 
 // WebApp Initialized -- check for hash change
-window.location.hash = ''
+window.location.hash = '#'
+
 if (window.location.hash) {
     controller()
 } else {

@@ -1,7 +1,3 @@
-// concated data
-    // ////////// Setting the temp bar height
-    var background = document.querySelector('.tempBackDrop').style.height = "400px";
-    var thermom = document.querySelector('.fluidObject').style. height =   parseInt(tempData) / 100 *  parseInt(background)  + 'px';
 
      // When button is pressed -- how to diffrentiate?
 // Capturing Hour and Week Data 
