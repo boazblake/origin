@@ -23,10 +23,9 @@ function build_Forcast_API_URL(input_Lat, input_long) {
     return weatherURL + '/' + input_Lat + ',' + input_long
 }
 
-
 /////////// MAIN CONTROLLER
 
-//HASH CONTROL
+//HASH CONTROL and View Changer
 function controller() {
 
     var route = window.location.hash.substr(2)
@@ -47,7 +46,7 @@ function controller() {
     var forcast_URL = build_Forcast_API_URL(stringLat, stringLong)
     console.log(forcast_URL)
 
-    make_And_Return_Forecast_Promise(forcast_URL).then(render_Now_View)
+    make_And_Return_Forecast_Promise(forcast_URL).then(render_Week_View)
 }
 
 function handle_Forcast_Data(forcast_Data) {
@@ -220,14 +219,21 @@ function render_Now_View(current_Weather_Data) {
     var rainData = current_WeatherDetails.precipProbability
     // weatherBox.innerHTML += '<div class="nowContainer">'
     weatherBoxUL = '<Div class="nowContainer">'
-    weatherBoxTemp ='<h6> Todays Temp:	' + tempData + '</h6>'
-    weatherBoxFullDate = '<h6>' + day +' '+dateofMonth+' '+ month + '' + ' '+ ' '+date.getFullYear() +'</h6>'
-    weatherBoxRain = '<h6> Chance of Rain:	' + rainData + '</h6>'
-    weatherBoxIcon = '<h6>' + iconData + '</h6>'
-    weatherBoxText = '<h6>' + textData + '</h6>'
-    weatherBoxDay= '<h6>' + day + '</h6></div>'
+    weatherBoxTemp ='<h6 clas="nowDeets" id="temp"> Todays Temp:	' + tempData + '  &deg </h6>'
+    weatherBoxFullDate = '<h6 clas="nowDeets" id="fullDate">' + day +' '+dateofMonth+' '+ month + '' +date.getFullYear() +'</h6>'
+    weatherBoxRain = '<h6 clas="nowDeets" id="rain"> Chance of Rain:	' + rainData + '</h6>'
+    weatherBoxIcon = '<canvas class="nowDeets" id="icon">' + iconData + '</canvas>'
+    weatherBoxText = '<h6 clas="nowDeets" id="text">' + textData + '</h6>'
+    // weatherBoxDay= '<h6 clas="nowDeets" id="day">' + day + '</h6></div>'
 
-    HTML_Str_To_DOM = weatherBoxUL + weatherBoxTemp + weatherBoxFullDate + weatherBoxRain + weatherBoxIcon + weatherBoxText + weatherBoxDay
+    HTML_Str_To_DOM = weatherBoxUL + weatherBoxTemp + weatherBoxFullDate + weatherBoxRain + weatherBoxIcon + weatherBoxText //+ weatherBoxDay
+
+
+    // ////////// Setting the temp bar height
+    var background = document.querySelector('.tempBackDrop').style.height = "400px";
+    var thermom = document.querySelector('.fluidObject').style.	height =   parseInt(tempData) / 100 *  parseInt(background)  + 'px';
+
+
 
     return weatherBox.innerHTML = HTML_Str_To_DOM
 }
@@ -266,30 +272,34 @@ function render_Hour_View(hourly_Weather_Data) {
         var hour_details = hour_WeatherDetails
         for (var i = 0; i < hour_Array.length; i++) {
 
-            // // Date object -- time_value: NOW
-            // // var nowDate = new Date()
-
-
-            for (var i = 0; i < hour_Array.length; i++) {
-            var fulldate = new Date()
-                var hour = hour_Array[i].time
+            for (var i = 1; i < hour_Array.length; i++) {
+            var fullDate = new Date(1457280000)
+		   
+		    // var hour = fulldate.getTime();
+                hour = hour_Array[i].time
            
-                console.log(hour)
+                console.log(fullDate)
 
 
             var hour_Temp = '<h2>Hour'+[i]+': ' + hour + '</h5>'
                 hour_Temp += '<h5>Temp: ' + hour_Array[i].temperature + 'F</h5>'
                 hour_Temp += '<h4> chance of rain: ' + hour_Array[i].precipProbability + '</h4>'
                 array_HTML_str += '<div class="hourContainer">' + hour_Temp + '</div>'
+            
+                // ////////// Setting the temp bar height
+                var background = document.querySelector('.tempBackDrop').style.height = "400px";
+                var thermom = document.querySelector('.fluidObject').style.	height = parseInt(hour_Array[i].temperature) / 100 *  parseInt(background)  + 'px';
+
             }
+
         }
         return 'Today will be: ' +  hour_WeatherDetails + array_HTML_str
     }
 
-
     var hourViewInstance = new View_Constructor('#weatherData', hour_by_Hour_Template)
     
     hourViewInstance.renderHTML(hour_by_Hour_Array)
+
 }
 
 // Capturing week Data
@@ -354,8 +364,16 @@ function render_Week_View(Week_Weather_Data) {
                 week_Temp += '<h4> chance of rain: ' + week_Array[i].precipProbability + '</h4>'
                 week_Temp += '<p> chance of rain: ' + week_Array[i].icon + '</p>'
                 array_HTML_str += '<div class="weekContainer">' + week_Temp + '</div>'
+                
+    // ////////// Setting the temp bar height
+    var background = document.querySelector('.tempBackDrop').style.height = "400px";
+    var thermom = document.querySelector('.fluidObject').style.	height =   parseInt(week_Array[i].temperature) / 100 *  parseInt(background)  + 'px';
+
             }
         }
+
+
+
         return '<p class="summery">This Weeks Summary is: ' +  week_WeatherDetails + '</p>'+ array_HTML_str 
 
     }

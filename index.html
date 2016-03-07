@@ -8,37 +8,27 @@
 </head>
 
 <body>
-	<div id="container" class="alignChildren">
-
-
-		<div class="tempContainer">
-				<div class="tempBackDrop topOfTemp"></div>
-				<div class="topOfTemp fluidObject"></div>
-				<div class="bottomOfTemp"></div>
-		</div>
-
-
-
-		<div id="dataContents">
-			<div id="hed">HEADER
-				<div id="floating-panel">
-					<input id="address" type="textbox" placeholder="Search for a location">
-					<input id="submit" type="button" value="Geocode">
-				</div>
-				<div id="map"></div>
-			</div>
-			
-			<div id="buttons">
-			<button class="buttons now" value="now">NOW</button>
-			<button class="buttons hour" value="hour">HOUR</button>
-			<button class="buttons week" value="week">WEEK</button>
-			</div>
-			<div id="weatherData" class="alignChildren">DYNAMIC WEATHER DATA GOES HERE</div>
-		</div>
-	
-
-	</div>
-
+    <div id="container" class="alignChildren">
+        <div class="tempContainer">
+            <div class="tempBackDrop temp"></div>
+            <div class="fluidObject temp"></div>
+        </div>
+        <div id="dataContents" class="alignChildren">
+            <div id="hed">HEADER
+                <div id="floating-panel">
+                    <input id="address" type="textbox" placeholder="Search for a location">
+                    <input id="submit" type="button" value="Geocode">
+                </div>
+                <div id="map"></div>
+            </div>
+            <div id="buttons">
+                <button class="buttons now" value="now">NOW</button>
+                <button class="buttons hour" value="hour">HOUR</button>
+                <button class="buttons week" value="week">WEEK</button>
+            </div>
+            <div id="weatherData" class="alignChildren">DYNAMIC WEATHER DATA GOES HERE</div>
+        </div>
+    </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script src="js/script.js" type="text/javascript" charset="utf-8" async defer></script>
 </body>
